@@ -1,0 +1,23 @@
+{
+  "name": "study-groups-fn-metrics",
+  "version": "1.0.0",
+  "description": "Funcao Serverless HTTP Trigger de calculo analitico de produtividade dos Grupos de Estudo",
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && func start",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
+
