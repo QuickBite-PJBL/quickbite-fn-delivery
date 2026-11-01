@@ -236,5 +236,80 @@ describe('Motor de calculo analitico de produtividade dos Grupos de Estudo', () 
     );
     expect(recomendacaoPoucasTarefas).toContain('precisa concluir as tarefas pendentes');
   });
-});
 
+  it('deve proteger contra payload nulo, indefinido ou grupos sem tarefas cadastradas', () => {
+    const resultadoNulo = calculateStudyMetrics(null);
+    expect(resultadoNulo.overallCompletionRate).toBe(0);
+    expect(resultadoNulo.groupBreakdown).toHaveLength(0);
+
+    const resultadoSemTarefas = calculateStudyMetrics({
+      groups: [
+        {
+          id: 'grp-recem-criado',
+          name: 'Grupo Compiladores e Automatos',
+          subject: 'Teoria da Computacao',
+          memberCount: 0,
+          targetHours: -5
+        }
+      ],
+      tasks: [],
+      messages: [
+        {
+          id: 'msg-boas-vindas',
+          groupId: 'grp-recem-criado',
+          senderName: 'Fernanda Lima',
+          content: 'Grupo criado! Vamos definir as tarefas da semana.'
+        }
+      ]
+    });
+
+    expect(resultadoSemTarefas.overallCompletionRate).toBe(0);
+    expect(resultadoSemTarefas.groupBreakdown).toHaveLength(1);
+    expect(resultadoSemTarefas.groupBreakdown[0].totalTasks).toBe(0);
+    expect(resultadoSemTarefas.groupBreakdown[0].completionRate).toBe(0);
+    expect(resultadoSemTarefas.groupBreakdown[0].memberCount).toBe(1);
+    expect(resultadoSemTarefas.groupBreakdown[0].targetHours).toBe(10);
+    expect(resultadoSemTarefas.groupBreakdown[0].recommendation).toContain(
+      'ainda nao possui tarefas cadastradas'
+    );
+  });
+
+  it('deve ignorar registros malformados e aplicar horas padrao quando estimativa for invalida', () => {
+    const resultado = calculateStudyMetrics({
+      groups: [
+        {
+          id: '   ',
+          name: 'Grupo Invalido'
+        },
+        {
+          id: 'grp-redes-computadores',
+          name: 'Grupo Redes e Protocolos TCP/IP',
+          subject: 'Redes de Computadores',
+          memberCount: 3
+        }
+      ],
+      tasks: [
+        {
+          id: 'tsk-horas-negativas',
+          groupId: 'grp-redes-computadores',
+          title: 'Configurar roteamento estatico no simulador',
+          completed: true,
+          estimatedHours: -4
+        },
+        {
+          id: 'tsk-sem-grupo',
+          groupId: '',
+          title: 'Tarefa orfa que deve ser ignorada',
+          completed: true,
+          estimatedHours: 10
+        }
+      ],
+      messages: null
+    });
+
+    expect(resultado.groupBreakdown).toHaveLength(1);
+    expect(resultado.totalEstimatedHours).toBe(2);
+    expect(resultado.completedHours).toBe(2);
+    expect(resultado.overallCompletionRate).toBe(100);
+  });
+});
