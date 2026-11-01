@@ -5,6 +5,7 @@
   "main": "dist/src/functions/*.js",
   "scripts": {
     "build": "tsc",
+    "watch": "tsc -w",
     "start": "npm run build && func start",
     "test": "vitest run"
   },
@@ -20,4 +21,3 @@
     "node": ">=20.0.0"
   }
 }
-

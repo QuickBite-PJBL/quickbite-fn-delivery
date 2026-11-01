@@ -1,0 +1,13 @@
+.git*
+.vscode
+local.settings.json
+local.settings.json.example
+.env
+.env.example
+tests
+coverage
+src
+tsconfig.json
+*.spec.ts
+*.map
+README.md
